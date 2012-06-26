@@ -22,8 +22,10 @@ class Spree::Admin::PartsController < Spree::Admin::BaseController
     if params[:q].blank?
       @available_products = []
     else
+      product_id = params[:product_id]
       query = "%#{params[:q]}%"
-      @available_products = Spree::Product.not_deleted.available.joins(:master).where("(spree_products.name #{LIKE} ? OR spree_variants.sku #{LIKE} ?) AND can_be_part = ?", query, query, true).limit(30)
+
+      @available_products = Spree::Product.where("spree_products.permalink != '#{product_id}'").not_deleted.available.joins(:master).where("(spree_products.name #{LIKE} ? OR spree_variants.sku #{LIKE} ?) AND can_be_part = ?", query, query, true).limit(30)
       
       @available_products.uniq!
     end
